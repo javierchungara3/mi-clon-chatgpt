@@ -28,8 +28,8 @@
     </div>
 
     <script>
-        // ⚠️ PEGA TU CLAVE DE GITHUB AQUÍ ADENTRO DE LAS COMILLAS:
-        const GITHUB_TOKEN = "ghp_ToPVAGIJNbbS4NrEBdBQSYGEMcxUAM0NA04g"; 
+        // Tu clave de GitHub real ya integrada:
+        const GITHUB_TOKEN = "ghp_ToPVAGIJNbbS4NrEBdBQSYGEMcxUAm0NA04g"; 
 
         async function enviarMensaje() {
             const input = document.getElementById('user-input');
@@ -56,7 +56,7 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
 
             try {
-                // Llamada en tiempo real al servidor de IA de GitHub
+                // Llamada directa al modelo gpt-4o-mini de GitHub
                 const response = await fetch("https://azure.com", {
                     method: "POST",
                     headers: {
@@ -66,7 +66,7 @@
                     body: JSON.stringify({
                         model: "gpt-4o-mini", 
                         messages: [
-                            { role: "system", content: "Eres un asistente de IA amigable y conciso." },
+                            { role: "system", content: "Eres un asistente de IA amigable, inteligente y conciso. Responde siempre en español." },
                             { role: "user", content: mensajeTexto }
                         ]
                     })
@@ -77,7 +77,7 @@
                 if (data.choices && data.choices[0]) {
                     botDiv.innerText = data.choices[0].message.content;
                 } else {
-                    botDiv.innerText = "Error: No se recibió respuesta del cerebro de IA.";
+                    botDiv.innerText = "Error: No se recibió respuesta correcta del servidor.";
                 }
             } catch (error) {
                 botDiv.innerText = "Hubo un problema al conectar con la IA. Revisa tu clave.";
