@@ -3,32 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Clon de ChatGPT</title>
+    <title>Mi Clon de ChatGPT Real</title>
     <style>
         body { font-family: Arial, sans-serif; background-color: #343541; color: white; display: flex; flex-direction: column; height: 100vh; margin: 0; }
         #chat-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .message { padding: 12px; border-radius: 8px; max-width: 80%; }
+        .message { padding: 12px; border-radius: 8px; max-width: 80%; line-height: 1.4; }
         .user { background-color: #444654; align-self: flex-end; }
         .bot { background-color: #10a37f; align-self: flex-start; }
         #input-container { padding: 20px; background-color: #40414f; display: flex; gap: 10px; }
         input { flex: 1; padding: 12px; border: none; border-radius: 6px; background-color: #40414f; color: white; border: 1px solid #565869; }
         button { background-color: #10a37f; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; }
+        button:disabled { background-color: #565869; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
     <div id="chat-container">
-        <div class="message bot">¡Hola! Soy tu asistente de IA personalizado. ¿En qué puedo ayudarte hoy?</div>
+        <div class="message bot">¡Listo! Ahora estoy conectado a una Inteligencia Artificial real. Pregúntame lo que quieras.</div>
     </div>
 
     <div id="input-container">
         <input type="text" id="user-input" placeholder="Escribe tu mensaje aquí...">
-        <button onclick="enviarMensaje()">Enviar</button>
+        <button id="send-btn" onclick="enviarMensaje()">Enviar</button>
     </div>
 
     <script>
-        function enviarMensaje() {
+        // ⚠️ PEGA TU CLAVE DE GITHUB AQUÍ ADENTRO DE LAS COMILLAS:
+        const GITHUB_TOKEN = "ghp_ToPVAGIJNbbS4NrEBdBQSYGEMcxUAM0NA04g"; 
+
+        async function enviarMensaje() {
             const input = document.getElementById('user-input');
+            const sendBtn = document.getElementById('send-btn');
             const mensajeTexto = input.value.trim();
             if (mensajeTexto === "") return;
 
@@ -40,17 +45,46 @@
             userDiv.innerText = mensajeTexto;
             chatContainer.appendChild(userDiv);
             input.value = "";
+            
+            sendBtn.disabled = true;
 
-            // 2. Aquí conectarás la API de GitHub Models o OpenAI
-            // Por ahora simulamos una respuesta rápida del bot
-            setTimeout(() => {
-                const botDiv = document.createElement('div');
-                botDiv.className = 'message bot';
-                botDiv.innerText = "Recibí tu mensaje. Pronto nos conectaremos a la IA real para responderte.";
-                chatContainer.appendChild(botDiv);
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            }, 1000);
+            // 2. Mostrar indicador de carga
+            const botDiv = document.createElement('div');
+            botDiv.className = 'message bot';
+            botDiv.innerText = "Pensando...";
+            chatContainer.appendChild(botDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
 
+            try {
+                // Llamada en tiempo real al servidor de IA de GitHub
+                const response = await fetch("https://azure.com", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${GITHUB_TOKEN}`
+                    },
+                    body: JSON.stringify({
+                        model: "gpt-4o-mini", 
+                        messages: [
+                            { role: "system", content: "Eres un asistente de IA amigable y conciso." },
+                            { role: "user", content: mensajeTexto }
+                        ]
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.choices && data.choices[0]) {
+                    botDiv.innerText = data.choices[0].message.content;
+                } else {
+                    botDiv.innerText = "Error: No se recibió respuesta del cerebro de IA.";
+                }
+            } catch (error) {
+                botDiv.innerText = "Hubo un problema al conectar con la IA. Revisa tu clave.";
+                console.error(error);
+            }
+
+            sendBtn.disabled = false;
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
     </script>
