@@ -19,7 +19,7 @@
 <body>
 
     <div id="chat-container">
-        <div class="message bot">¡Conexión abierta establecida con éxito! No necesitas contraseñas. Pregúntame lo que quieras.</div>
+        <div class="message bot">¡Conexión rápida establecida! Pregúntame lo que quieras y te responderé de inmediato.</div>
     </div>
 
     <div id="input-container">
@@ -36,7 +36,7 @@
 
             const chatContainer = document.getElementById('chat-container');
 
-            // 1. Mostrar tu mensaje en pantalla
+            // 1. Mostrar tu mensaje
             const userDiv = document.createElement('div');
             userDiv.className = 'message user';
             userDiv.innerText = mensajeTexto;
@@ -45,7 +45,7 @@
             
             sendBtn.disabled = true;
 
-            // 2. Mostrar indicador de "Pensando..."
+            // 2. Mostrar "Pensando..."
             const botDiv = document.createElement('div');
             botDiv.className = 'message bot';
             botDiv.innerText = "Pensando...";
@@ -53,27 +53,31 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
 
             try {
-                // Usamos un servidor de IA libre de uso público para tus pruebas
-                const response = await fetch("https://huggingface.co", {
+                // Servidor de alto rendimiento libre de contraseñas complejas
+                const response = await fetch("https://hyperbolic.xyz", {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ 
-                        inputs: `<|system|>\nEres un asistente en español amigable. Concreta tus respuestas en español.</s>\n<|user|>\n${mensajeTexto}</s>\n<|assistant|>\n`
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        model: "Qwen/Qwen2.5-7B-Instruct",
+                        messages: [
+                            { role: "system", content: "Eres un asistente inteligente y amigable. Responde siempre de forma clara y en idioma español." },
+                            { role: "user", content: mensajeTexto }
+                        ],
+                        max_tokens: 150
                     })
                 });
 
                 const data = await response.json();
                 
-                if (data && data[0] && data[0].generated_text) {
-                    // Limpiamos el texto para mostrar solo la respuesta de la IA
-                    const textoCompleto = data[0].generated_text;
-                    const partes = textoCompleto.split("<|assistant|>\n");
-                    botDiv.innerText = partes[partes.length - 1].trim();
+                if (data && data.choices && data.choices[0].message) {
+                    botDiv.innerText = data.choices[0].message.content;
                 } else {
-                    botDiv.innerText = "La IA está ocupada procesando otras solicitudes, intenta enviar de nuevo.";
+                    botDiv.innerText = "La IA recibió el mensaje pero tardó en procesarlo. Intenta de nuevo.";
                 }
             } catch (error) {
-                botDiv.innerText = "Hubo un problema temporal con el servidor libre de IA.";
+                botDiv.innerText = "Hubo un inconveniente al conectar. Espera un momento y vuelve a enviar.";
                 console.error(error);
             }
 
